@@ -1,0 +1,13 @@
+{
+  "name": "economy-discord-bot",
+  "version": "1.0.0",
+  "description": "Economy Discord Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "mongodb": "^6.3.0"
+  }
+}
