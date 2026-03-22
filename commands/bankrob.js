@@ -3,7 +3,7 @@ const { rand, shortNum } = require('../economy');
 const { isProtected } = require('../protected_roles');
 const { EmbedBuilder } = require('discord.js');
 
-const COOLDOWN = 3 * 60 * 60 * 1000;
+const COOLDOWN = 24 * 60 * 60 * 1000; // 24 цаг
 
 module.exports = {
   name: 'bankrob',
@@ -30,10 +30,21 @@ module.exports = {
 
     if (now - (robber.lastBankRob || 0) < COOLDOWN) {
       const left = Math.ceil((COOLDOWN - (now - robber.lastBankRob)) / 60000);
-      return message.reply({ embeds: [embed.setDescription(`⏳ **${left} минут** дараа дахин банк дээрэмдэж болно.`)] });
+      const hours = Math.floor(left / 60);
+      const mins = left % 60;
+      return message.reply({ embeds: [embed.setDescription(`⏳ **${hours} цаг ${mins} минут** дараа дахин банк дээрэмдэж болно.`)] });
     }
 
     if (victim.bank <= 0) return message.reply({ embeds: [embed.setDescription(`❌ **${target.username}**-ын банкинд мөнгө байхгүй!`)] });
+
+    // Bank Shield шалгах
+    if (victim.inventory?.bank_shield) {
+      victim.inventory.bank_shield = false;
+      robber.lastBankRob = now;
+      saveUser(userId, robber);
+      saveUser(target.id, victim);
+      return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Bank Shield-ээр хамгаалагдсан! Shield устав.`)] });
+    }
 
     robber.lastBankRob = now;
     const success = Math.random() < 0.35;
