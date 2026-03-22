@@ -1,28 +1,37 @@
-const { getUser, saveUser, getAllUsers } = require('../db');
+const { getUser, saveUser } = require('../db');
 const { shortNum } = require('../economy');
 
 module.exports = {
   name: 'giveall',
   async execute(message, args) {
     const isAdmin = message.member.permissions.has('Administrator') || message.author.id === message.guild.ownerId;
-    if (!isAdmin) return;
-
-    const amount = parseInt(args[0]);
-    if (!amount || amount <= 0) return;
-
-    // Server-ийн бүх гишүүдэд өгөх
-    const members = await message.guild.members.fetch();
-    let count = 0;
-
-    for (const [memberId, member] of members) {
-      if (member.user.bot) continue;
-      const user = getUser(memberId);
-      user.cash += amount;
-      saveUser(memberId, user);
-      count++;
+    if (!isAdmin) {
+      return message.reply('❌ Зөвхөн Admin ашиглах боломжтой.');
     }
 
-    await message.author.send(`✅ **${count} хэрэглэгч** бүрт **₮${shortNum(amount)}** өгөв.`);
-    await message.delete().catch(() => {});
+    const amount = parseInt(args[0]);
+    if (!amount || amount <= 0) {
+      return message.reply('❌ Жишээ: `!giveall 1000`');
+    }
+
+    await message.reply(`⏳ Бүх гишүүдэд ₮${shortNum(amount)} өгч байна...`);
+
+    try {
+      const members = await message.guild.members.fetch();
+      let count = 0;
+
+      for (const [memberId, member] of members) {
+        if (member.user.bot) continue;
+        const user = getUser(memberId);
+        user.cash += amount;
+        saveUser(memberId, user);
+        count++;
+      }
+
+      await message.channel.send(`✅ **${count} хэрэглэгч** бүрт **₮${shortNum(amount)}** өгөв!`);
+    } catch (err) {
+      console.error(err);
+      await message.channel.send('❌ Алдаа гарлаа.');
+    }
   },
 };
