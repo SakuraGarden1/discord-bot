@@ -3,7 +3,20 @@ const { rand, shortNum } = require('../economy');
 const { EmbedBuilder } = require('discord.js');
 
 const COOLDOWN = 60 * 60 * 1000;
-const PROTECTED_ROLES = ['staff', 'Staff', 'STAFF', 'Admin', 'admin', 'Moderator', 'moderator', 'Mod', 'mod'];
+
+const PROTECTED_ROLES = [
+  '⁎⁺˳✧༚Owner (真人)',
+  '⁎⁺˳✧༚Co owner (朝臣)',
+  '⁎⁺˳✧༚Admin (宿禰)',
+  '⁎⁺˳✧༚ Developer',
+  '⁎⁺˳✧༚ Event Manager (臣)',
+  '⁎⁺˳✧༚ Adult Manager (臣)',
+  '⁎⁺˳✧༚ Moderator (連)',
+  '⁎⁺˳✧༚ Host (稲置)',
+  '⁎⁺˳✧༚ Designer (宮月)',
+  '⁎⁺˳✧༚ Staff (宮月)',
+  '⁎⁺˳✧༚ Trial Staff (県主)',
+];
 
 module.exports = {
   name: 'rob',
@@ -16,12 +29,11 @@ module.exports = {
     if (target.id === userId) return message.reply({ embeds: [embed.setDescription('❌ Өөрөөсөө хулгайлах боломжгүй!')] });
     if (target.bot) return message.reply({ embeds: [embed.setDescription('❌ Bot-оос хулгайлах боломжгүй!')] });
 
-    // Staff role шалгах
     try {
       const targetMember = await message.guild.members.fetch(target.id);
       const hasProtectedRole = targetMember.roles.cache.some(r => PROTECTED_ROLES.includes(r.name));
       if (hasProtectedRole) {
-        return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Staff/Admin тул хулгайлах боломжгүй!`)] });
+        return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Staff гишүүн тул хулгайлах боломжгүй!`)] });
       }
     } catch {}
 
