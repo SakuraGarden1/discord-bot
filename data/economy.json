@@ -1,0 +1,22 @@
+{
+  "users": {
+    "933593996599631903": {
+      "cash": 2368,
+      "bank": 0,
+      "xp": 22,
+      "level": 1,
+      "lastWork": 1774617317418,
+      "lastRob": 0,
+      "lastCrime": 0,
+      "lastDaily": 0,
+      "lastBankRob": 0,
+      "dailyStreak": 0,
+      "inventory": {},
+      "hunger": 89.29318518518518,
+      "lastHungerUpdate": 1774617317418,
+      "married": null,
+      "selectedJob": null
+    }
+  },
+  "owner": null
+}
