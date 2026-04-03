@@ -18,9 +18,7 @@ module.exports = {
 
     try {
       const targetMember = await message.guild.members.fetch(target.id);
-      if (isProtected(targetMember)) {
-        return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Staff гишүүн тул хулгайлах боломжгүй!`)] });
-      }
+      if (isProtected(targetMember)) return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Staff тул хулгайлах боломжгүй!`)] });
     } catch {}
 
     const robber = getUser(userId);
@@ -39,7 +37,21 @@ module.exports = {
       robber.lastRob = now;
       saveUser(userId, robber);
       saveUser(target.id, victim);
-      return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Rob Shield-ээр хамгаалагдсан! Shield устав.`)] });
+      return message.reply({ embeds: [embed.setDescription(`🛡️ **${target.username}** Rob Shield-ээр хамгаалагдсан!`)] });
+    }
+
+    // Police Protection шалгах
+    if (victim.inventory?.police_protect && Math.random() < 0.30) {
+      const fine = rand(500, 2000);
+      robber.cash = Math.max(0, robber.cash - fine);
+      robber.lastRob = now;
+      saveUser(userId, robber);
+      embed.addFields(
+        { name: '👮 Police Protection!', value: `**${target.username}**-ын цагдаа хамгаалалт ажиллалаа!` },
+        { name: '💸 Торгууль', value: `₮${shortNum(fine)}`, inline: true },
+        { name: '👛 Cash', value: `₮${shortNum(robber.cash)}`, inline: true },
+      );
+      return message.reply({ embeds: [embed] });
     }
 
     robber.lastRob = now;
@@ -63,7 +75,7 @@ module.exports = {
       embed.addFields(
         { name: '👮 Баригдлаа!', value: 'Цагдаа баривчиллаа' },
         { name: '💸 Торгууль', value: `₮${shortNum(fine)}`, inline: true },
-        { name: '👛 Таны cash', value: `₮${shortNum(robber.cash)}`, inline: true },
+        { name: '👛 Cash', value: `₮${shortNum(robber.cash)}`, inline: true },
       );
     }
     message.reply({ embeds: [embed] });

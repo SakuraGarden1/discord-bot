@@ -27,7 +27,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       // SUPREME badge идэвхтэй үед profile-н өнгийг "solid" буюу өөрөөр гаргана.
-      .setColor(hasSupremeBadge ? 0xFFD700 : 0xE8B84B)
+      .setColor(hasSupremeBadge ? 0xFFD700 : 0xff69b4)
       .setTitle(`👤 ${target.username}`)
       .setThumbnail(target.displayAvatarURL())
       .addFields(

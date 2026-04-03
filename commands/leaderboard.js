@@ -15,7 +15,7 @@ module.exports = {
     if (sorted.length === 0) return message.reply('📊 Leaderboard хоосон.');
 
     const medals = ['🥇', '🥈', '🥉'];
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🏆 LEADERBOARD');
+    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('🏆 LEADERBOARD');
 
     const lines = [];
     for (let i = 0; i < sorted.length; i++) {

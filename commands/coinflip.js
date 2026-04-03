@@ -29,6 +29,7 @@ module.exports = {
         { name: '👛 Cash', value: `₮${shortNum(user.cash)}`, inline: true },
       );
     } else {
+      user.stress = Math.min(100, (user.stress||0) + 5);
       embed.addFields(
         { name: `${emoji} ${result.toUpperCase()}`, value: '❌ Таны таавар буруу!', inline: true },
         { name: '💸 Алдсан', value: `-₮${shortNum(bet)}`, inline: true },

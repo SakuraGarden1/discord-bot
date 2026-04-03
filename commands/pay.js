@@ -1,5 +1,6 @@
-const { getUser, saveUser, addToOwner } = require('../db');
-const { applyTax } = require('../economy');
+const { getUser, saveUser } = require('../db');
+const { shortNum } = require('../economy');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
   name: 'pay',
@@ -7,31 +8,27 @@ module.exports = {
     const userId = message.author.id;
     const target = message.mentions.users.first();
     const amount = parseInt(args[1]);
+    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('💸 Pay');
 
-    if (!target) return message.reply('❌ Хэнд илгээхээ заа. Жишээ: `!pay @user 1000`');
-    if (target.id === userId) return message.reply('❌ Өөртөө мөнгө илгээх боломжгүй!');
-    if (target.bot) return message.reply('❌ Bot руу мөнгө илгээх боломжгүй!');
-    if (!amount || amount <= 0) return message.reply('❌ Зөв дүн оруул. Жишээ: `!pay @user 1000`');
+    if (!target) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!pay @user 1000`')] });
+    if (target.id === userId) return message.reply({ embeds: [embed.setDescription('❌ Өөртөө илгээх боломжгүй!')] });
+    if (!amount || amount <= 0) return message.reply({ embeds: [embed.setDescription('❌ Зөв дүн оруул.')] });
 
     const sender = getUser(userId);
     const receiver = getUser(target.id);
 
-    if (amount > sender.cash) return message.reply(`❌ Хангалттай cash байхгүй! Таны cash: ₮${sender.cash.toLocaleString()}`);
+    if (amount > sender.cash) return message.reply({ embeds: [embed.setDescription(`❌ Cash хүрэлцэхгүй! ₮${shortNum(sender.cash)}`)] });
 
-    const { net, tax } = applyTax(amount);
     sender.cash -= amount;
-    receiver.cash += net;
-    addToOwner(tax);
-
+    receiver.cash += amount;
     saveUser(userId, sender);
     saveUser(target.id, receiver);
 
-    message.reply(
-      `💸 **${message.author.username}** → **${target.username}**\n` +
-      `💵 Илгээсэн: ₮${amount.toLocaleString()}\n` +
-      `🏦 Татвар (5%): ₮${tax.toLocaleString()}\n` +
-      `✅ Хүлээн авсан: **₮${net.toLocaleString()}**\n` +
-      `👛 Таны үлдэгдэл: ₮${sender.cash.toLocaleString()}`
+    embed.addFields(
+      { name: '💸 Илгээсэн', value: `₮${shortNum(amount)}`, inline: true },
+      { name: '👤 Хүлээн авсан', value: target.username, inline: true },
+      { name: '👛 Таны cash', value: `₮${shortNum(sender.cash)}`, inline: true },
     );
+    message.reply({ embeds: [embed] });
   },
 };
