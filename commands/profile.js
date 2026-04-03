@@ -9,6 +9,7 @@ module.exports = {
     const target = message.mentions.users.first() || message.author;
     let user = getUser(target.id);
     user = updateHunger(user);
+    const hasSupremeBadge = !!user.inventory?.supreme_badge;
     const job = getJob(user.level);
     const nextXP = xpForNextLevel(user.level);
     const progress = Math.floor((user.xp / nextXP) * 10);
@@ -25,20 +26,25 @@ module.exports = {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(0xff69b4)
+      // SUPREME badge идэвхтэй үед profile-н өнгийг "solid" буюу өөрөөр гаргана.
+      .setColor(hasSupremeBadge ? 0xFFD700 : 0xE8B84B)
       .setTitle(`👤 ${target.username}`)
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '👔 Ажил', value: job.name, inline: true },
         { name: '📊 Level', value: `${user.level}`, inline: true },
         { name: '🔥 Streak', value: `${streak} өдөр`, inline: true },
+        { name: '👔 Ажил', value: job.name, inline: true },
+        { name: '💍 Гэрлэлт', value: marriedText, inline: true },
         { name: '⭐ XP', value: `\`[${bar}]\` ${user.xp}/${nextXP}` },
         { name: '💵 Cash', value: `₮${shortNum(user.cash)}`, inline: true },
         { name: '🏦 Bank', value: `₮${shortNum(user.bank)}`, inline: true },
         { name: '💰 Нийт', value: `₮${shortNum(user.cash + user.bank)}`, inline: true },
         { name: `🍽️ Өлсгөлөн ${Math.floor(user.hunger)}%`, value: hungerBar },
-        { name: '💍 Гэрлэлт', value: marriedText, inline: true },
       );
+
+    if (hasSupremeBadge) {
+      embed.addFields({ name: '🏅 SUPREME Badge', value: 'Идэвхтэй', inline: true });
+    }
     message.reply({ embeds: [embed] });
   },
 };

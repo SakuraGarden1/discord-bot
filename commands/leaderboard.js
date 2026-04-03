@@ -15,7 +15,7 @@ module.exports = {
     if (sorted.length === 0) return message.reply('📊 Leaderboard хоосон.');
 
     const medals = ['🥇', '🥈', '🥉'];
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('🏆 LEADERBOARD');
+    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🏆 LEADERBOARD');
 
     const lines = [];
     for (let i = 0; i < sorted.length; i++) {
@@ -27,10 +27,10 @@ module.exports = {
         const member = await message.guild.members.fetch(u.id);
         username = member.displayName;
       } catch { username = `User#${u.id.slice(-4)}`; }
-      lines.push(`${medal} **${username}** — ₮${shortNum(u.total)} | Lv.${u.level} ${job.name}`);
+      lines.push(`${medal} **${username}**\n↳ ₮${shortNum(u.total)} | Lv.${u.level} ${job.name}`);
     }
 
-    embed.setDescription(lines.join('\n'));
+    embed.setDescription(lines.join('\n\n'));
     message.reply({ embeds: [embed] });
   },
 };
