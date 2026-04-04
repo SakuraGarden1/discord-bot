@@ -6,8 +6,10 @@ const {
   VoiceConnectionStatus,
   entersState,
   NoSubscriberBehavior,
+  StreamType,
 } = require('@discordjs/voice');
-const play = require('play-dl');
+const ytdl = require('@distube/ytdl-core');
+const yts = require('yt-search');
 
 const MAX_PLAYLIST = 25;
 const queues = new Map();
@@ -35,10 +37,13 @@ async function playTrack(guildId) {
   if (!q || !q.connection || !q.songs.length) return;
   const song = q.songs[0];
   try {
-    const src = await play.stream(song.url);
-    const resource = createAudioResource(src.stream, { inputType: src.type });
+    const stream = ytdl(song.url, {
+      filter: 'audioonly',
+      quality: 'lowestaudio',
+      highWaterMark: 1 << 25,
+    });
+    const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
     q.player.play(resource);
-    play.attachListeners(q.player, src);
   } catch (e) {
     console.error('[playTrack]', e);
     q.songs.shift();
@@ -78,26 +83,24 @@ async function ensureConnection(message) {
 async function resolveQuery(query) {
   const trimmed = query.trim();
   if (!trimmed) return null;
-  try {
-    const val = await play.validate(trimmed);
-    if (val === 'yt_video') {
-      const info = await play.video_basic_info(trimmed);
-      const vd = info.video_details;
-      return [{ title: vd.title || 'YouTube', url: vd.url || trimmed }];
+
+  // YouTube URL шууд өгсөн бол
+  if (trimmed.includes('youtube.com/watch') || trimmed.includes('youtu.be/')) {
+    try {
+      const info = await ytdl.getInfo(trimmed);
+      return [{ title: info.videoDetails.title, url: trimmed }];
+    } catch (e) {
+      console.error('[resolveQuery url]', e);
+      return null;
     }
-    if (val === 'yt_playlist') {
-      const pl = await play.playlist_info(trimmed, { incomplete: true });
-      const videos = await pl.all_videos();
-      return videos.slice(0, MAX_PLAYLIST).map((v) => ({ title: v.title || 'YouTube', url: v.url }));
-    }
-  } catch (e) {
-    console.error('[resolveQuery url]', e);
   }
+
+  // Текстээр хайх
   try {
-    const found = await play.search(trimmed, { limit: 1, source: { youtube: 'video' } });
-    if (!found.length) return null;
-    const v = found[0];
-    return [{ title: v.title || trimmed, url: v.url }];
+    const results = await yts(trimmed);
+    const videos = results.videos.slice(0, 1);
+    if (!videos.length) return null;
+    return [{ title: videos[0].title, url: videos[0].url }];
   } catch (e) {
     console.error('[resolveQuery search]', e);
     return null;
