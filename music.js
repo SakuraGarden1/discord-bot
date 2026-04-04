@@ -6,6 +6,7 @@ const {
   VoiceConnectionStatus,
   entersState,
   NoSubscriberBehavior,
+  StreamType,
 } = require('@discordjs/voice');
 const ytdl = require('@distube/ytdl-core');
 const yts = require('yt-search');
@@ -43,6 +44,7 @@ async function playTrack(guildId) {
   if (!q || !q.connection || !q.songs.length) return;
   const song = q.songs[0];
   try {
+    // opus/webm formatыг шууд stream хийх — ffmpeg шаардахгүй
     const stream = ytdl(song.url, {
       filter: (format) =>
         format.codecs === 'opus' &&
@@ -52,16 +54,11 @@ async function playTrack(guildId) {
       highWaterMark: 1 << 25,
     });
 
-    stream.on('error', (e) => {
-      console.error('[stream error]', e.message);
-    });
+    stream.on('error', (e) => console.error('[stream error]', e.message));
 
     const resource = createAudioResource(stream, {
+      inputType: StreamType.WebmOpus,
       inlineVolume: false,
-    });
-
-    resource.playStream.on('error', (e) => {
-      console.error('[resource error]', e.message);
     });
 
     q.player.play(resource);
@@ -115,10 +112,7 @@ async function ensureConnection(message) {
         entersState(q.connection, VoiceConnectionStatus.Connecting, 5_000),
       ]);
     } catch {
-      if (q.connection) {
-        q.connection.destroy();
-        q.connection = null;
-      }
+      if (q.connection) { q.connection.destroy(); q.connection = null; }
     }
   });
 
