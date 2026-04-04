@@ -10,7 +10,7 @@ module.exports = {
     const user = getUser(userId);
     const bet = parseInt(args[0]);
     const choice = args[1]?.toLowerCase();
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('🃏 High Low');
+    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🃏 High Low');
 
     if (!bet || bet <= 0 || !['h','l'].includes(choice))
       return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!hl 500 h` (h=өндөр >50, l=доогуур <50)')] });

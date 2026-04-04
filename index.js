@@ -1,6 +1,5 @@
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
-const { isProtected } = require('./protected_roles');
 
 const client = new Client({
   intents: [
@@ -8,6 +7,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 
@@ -21,26 +21,11 @@ for (const file of commandFiles) {
   if (command.aliases) command.aliases.forEach(a => client.aliases.set(a, command.name));
 }
 
-const DRUNK_DECAY_MS = 60 * 60 * 1000;
-
-client.on('ready', () => {
-  console.log(`✅ Bot is online as ${client.user.tag}`);
-  const { decayAllUsersDrunk } = require('./db');
-  const tick = () => {
-    try {
-      decayAllUsersDrunk();
-    } catch (e) {
-      console.error('[decayAllUsersDrunk]', e);
-    }
-  };
-  setInterval(tick, DRUNK_DECAY_MS);
-});
+client.on('ready', () => console.log(`✅ Bot is online as ${client.user.tag}`));
 
 const cooldowns = new Map();
 const SPAM_COOLDOWN = 1500;
-
-// Согтолтоос хамааралгүй команд
-const ALWAYS_ALLOWED = ['pub', 'cigarshop', 'help', 'balance', 'bal', 'profile', 'pro'];
+const ALWAYS_ALLOWED = ['help', 'balance', 'bal', 'profile', 'pro', 'play', 'p', 'stop', 'skip', 'queue', 'q', 'loop', 'np'];
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
@@ -56,26 +41,6 @@ client.on('messageCreate', async (message) => {
   const now = Date.now();
   if (cooldowns.has(key) && now - cooldowns.get(key) < SPAM_COOLDOWN) return;
   cooldowns.set(key, now);
-
-  // Согтолт шалгах
-  if (!ALWAYS_ALLOWED.includes(resolvedName)) {
-    try {
-      const { getUser } = require('./db');
-      const user = getUser(message.author.id);
-      const hasStaffRole = !!message.member && isProtected(message.member);
-      const drunkBypassForRob = (resolvedName === 'rob' || resolvedName === 'bankrob') && hasStaffRole;
-      if ((user.drunk || 0) >= 6 && !drunkBypassForRob) {
-        const responses = [
-          '🥴 Та хэтэрхий согтсон тул энэ командыг ашиглах боломжгүй!',
-          '🍺 Та согтсон байна... юу хийж байгаагаа ч мэдэхгүй юм шиг байна!',
-          '🥃 Гараа хүргэж чадахгүй байна... хэтэрхий согтсон!',
-        ];
-        return message.reply(responses[Math.floor(Math.random() * responses.length)]);
-      }
-    } catch (e) {
-      console.error('[drunk gate]', e);
-    }
-  }
 
   try {
     await command.execute(message, args);

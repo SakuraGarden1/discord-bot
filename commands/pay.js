@@ -8,7 +8,7 @@ module.exports = {
     const userId = message.author.id;
     const target = message.mentions.users.first();
     const amount = parseInt(args[1]);
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('💸 Pay');
+    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('💸 Pay');
 
     if (!target) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!pay @user 1000`')] });
     if (target.id === userId) return message.reply({ embeds: [embed.setDescription('❌ Өөртөө илгээх боломжгүй!')] });

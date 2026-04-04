@@ -4,21 +4,21 @@ module.exports = {
   name: 'help',
   async execute(message) {
     const embed = new EmbedBuilder()
-      .setColor(0xff69b4)
+      .setColor(0xE8B84B)
       .setTitle('📖 BOT КОМАНДУУД')
       .setThumbnail(message.client.user.displayAvatarURL())
       .addFields(
-        { name: '💰 Мөнгө олох', value: '`!work` (10 мин)\n`!daily` (24 цаг)\n`!crime` (45 мин)\n`!job` — Ажил сонгох\n`!jobs` — Бүх ажил харах' },
-        { name: '🎮 Тоглоомууд', value: '`!sl <дүн>` — Slot\n`!cf <дүн> h/t` — Coinflip\n`!bj <дүн>` — Blackjack\n`!dice <дүн> <1-6>` — Шоо\n`!rps <дүн> r/p/s` — ЧЦХ\n`!guess <дүн>` — Тоо таах\n`!crash <дүн>` — Crash\n`!hl <дүн> h/l` — High Low' },
-        { name: '🦹 Хулгай', value: '`!rob @user` (1 цаг)\n`!br @user` — Bank rob (24 цаг)' },
-        { name: '🏦 Банк', value: '`!dep <дүн/all>`\n`!with <дүн/all>`\n`!pay @user <дүн>`' },
-        { name: '🍺 Pub & 🚬 Cigar', value: '`!pub` — Архины дэлгүүр\n`!pub <дугаар>` — Архи авах\n`!cigarshop` — Тамхины дэлгүүр\n`!cigarshop <дугаар>` — Тамхи авах' },
-        { name: '☕ Cafe', value: '`!cafe` — Цэс харах\n`!cafe <дугаар>` — Хоол авах\n⚠️ Өлссөн бол work ажиллахгүй!' },
-        { name: '💍 Гэрлэлт', value: '`!marry @user` — Санал тавих\n`!marry accept/decline/divorce`' },
-        { name: '📊 Мэдээлэл', value: '`!bal` `!pro` `!lb` `!inv`' },
-        { name: '🏪 Дэлгүүр', value: '`!shop` — Дэлгүүр харах\n`!buy <дугаар>` — Item авах\n`!use luckycharm`' },
+        { name: '🎵 Music', value: '`!play <дуу/link>` / `!p` — Дуу тоглуулах\n`!stop` — Зогсоох\n`!skip` — Дараагийн дуу\n`!queue` / `!q` — Жагсаалт\n`!loop` — Давтах\n`!np` — Одоогийн дуу' },
+        { name: '💰 Мөнгө олох', value: '`!work` (10 мин)\n`!daily` (24 цаг)\n`!crime` (45 мин)\n`!job` — Ажил сонгох' },
+        { name: '🎮 Тоглоомууд', value: '`!sl` `!cf h/t` `!bj` `!dice` `!rps` `!guess` `!crash` `!hl`' },
+        { name: '🦹 Хулгай', value: '`!rob @user` (1 цаг)\n`!br @user` (24 цаг)' },
+        { name: '🏦 Банк', value: '`!dep` `!with` `!pay @user`' },
+        { name: '☕ Cafe', value: '`!cafe` — Цэс харах\n`!cafe <дугаар>` — Хоол авах' },
+        { name: '💍 Гэрлэлт', value: '`!marry @user` `accept` `decline` `divorce`' },
+        { name: '📊 Мэдээлэл', value: '`!bal` `!pro` `!lb` `!inv` `!jobs`' },
+        { name: '🏪 Дэлгүүр', value: '`!shop` `!buy <1-19>` `!use luckycharm`' },
       )
-      .setFooter({ text: '💡 Татвар байхгүй | 📈 Level ахих тусам цалин нэмэгдэнэ!' });
+      .setFooter({ text: '📈 Level ахих тусам цалин нэмэгдэнэ!' });
     message.reply({ embeds: [embed] });
   },
 };

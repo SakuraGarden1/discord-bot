@@ -9,7 +9,7 @@ module.exports = {
   async execute(message, args) {
     const userId = message.author.id;
     const user = getUser(userId);
-    const embed = new EmbedBuilder().setColor(0xff69b4);
+    const embed = new EmbedBuilder().setColor(0xE8B84B);
 
     // !marry accept / decline
     if (args[0]?.toLowerCase() === 'accept') {

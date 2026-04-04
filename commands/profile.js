@@ -1,5 +1,5 @@
 const { getUser, updateHunger } = require('../db');
-const { getJob, xpForNextLevel, shortNum } = require('../economy');
+const { getJob, getRank, xpForNextLevel, shortNum } = require('../economy');
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
@@ -9,8 +9,8 @@ module.exports = {
     const target = message.mentions.users.first() || message.author;
     let user = getUser(target.id);
     user = updateHunger(user);
-    const hasSupremeBadge = !!user.inventory?.supreme_badge;
     const job = getJob(user.level);
+    const rank = getRank(user.level);
     const nextXP = xpForNextLevel(user.level);
     const progress = Math.floor((user.xp / nextXP) * 10);
     const bar = '█'.repeat(progress) + '░'.repeat(10 - progress);
@@ -26,11 +26,11 @@ module.exports = {
     }
 
     const embed = new EmbedBuilder()
-      // SUPREME badge идэвхтэй үед profile-н өнгийг "solid" буюу өөрөөр гаргана.
-      .setColor(hasSupremeBadge ? 0xFFD700 : 0xff69b4)
-      .setTitle(`👤 ${target.username}`)
+      .setColor(0xE8B84B)
+      .setTitle(`${rank.emoji} ${target.username}`)
       .setThumbnail(target.displayAvatarURL())
       .addFields(
+        { name: '🏅 Rank', value: `${rank.emoji} **${rank.name}**`, inline: true },
         { name: '📊 Level', value: `${user.level}`, inline: true },
         { name: '🔥 Streak', value: `${streak} өдөр`, inline: true },
         { name: '👔 Ажил', value: job.name, inline: true },
@@ -41,10 +41,6 @@ module.exports = {
         { name: '💰 Нийт', value: `₮${shortNum(user.cash + user.bank)}`, inline: true },
         { name: `🍽️ Өлсгөлөн ${Math.floor(user.hunger)}%`, value: hungerBar },
       );
-
-    if (hasSupremeBadge) {
-      embed.addFields({ name: '🏅 SUPREME Badge', value: 'Идэвхтэй', inline: true });
-    }
     message.reply({ embeds: [embed] });
   },
 };

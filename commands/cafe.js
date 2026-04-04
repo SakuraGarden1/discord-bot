@@ -16,7 +16,7 @@ module.exports = {
   async execute(message, args) {
     let user = getUser(message.author.id);
     user = updateHunger(user);
-    const embed = new EmbedBuilder().setColor(0xff69b4);
+    const embed = new EmbedBuilder().setColor(0xE8B84B);
 
     if (!args[0]) {
       // Цэс харуулах

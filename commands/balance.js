@@ -10,7 +10,7 @@ module.exports = {
     const user = getUser(target.id);
     const job = getJob(user.level);
     const embed = new EmbedBuilder()
-      .setColor(0xff69b4)
+      .setColor(0xE8B84B)
       .setTitle(`💰 ${target.username}-ын данс`)
       .setThumbnail(target.displayAvatarURL())
       .addFields(

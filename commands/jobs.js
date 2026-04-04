@@ -24,7 +24,7 @@ module.exports = {
     const lockedText = locked.join('\n').slice(0, 1020) || 'Байхгүй';
 
     const embed = new EmbedBuilder()
-      .setColor(0xff69b4)
+      .setColor(0xE8B84B)
       .setTitle('👔 Бүх ажлууд')
       .addFields(
         { name: `📊 Таны level: ${user.level}`, value: `Одоогийн ажил: ${currentJob.name}` },

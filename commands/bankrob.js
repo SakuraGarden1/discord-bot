@@ -11,7 +11,7 @@ module.exports = {
   async execute(message, args) {
     const userId = message.author.id;
     const target = message.mentions.users.first();
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('🏦 Банкны дээрэм');
+    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🏦 Банкны дээрэм');
 
     if (!target) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!bankrob @user`')] });
     if (target.id === userId) return message.reply({ embeds: [embed.setDescription('❌ Өөрийнхөө банкийг дээрэмдэж болохгүй!')] });

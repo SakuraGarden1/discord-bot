@@ -9,7 +9,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const amount = args[0]?.toLowerCase() === 'all' ? user.bank : parseInt(args[0]);
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('💵 Withdraw');
+    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('💵 Withdraw');
 
     if (!amount || amount <= 0) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!with 1000` эсвэл `!with all`')] });
     if (amount > user.bank) return message.reply({ embeds: [embed.setDescription('❌ Банкинд хангалттай мөнгө байхгүй!')] });

@@ -17,7 +17,7 @@ module.exports = {
       const left = Math.ceil((COOLDOWN - (now - user.lastDaily)) / 3600000);
       const mins = Math.ceil((COOLDOWN - (now - user.lastDaily)) / 60000) % 60;
       const embed = new EmbedBuilder()
-        .setColor(0xff69b4)
+        .setColor(0xE8B84B)
         .setTitle('🎁 Өдрийн урамшуулал')
         .setDescription(`⏳ **${left} цаг ${mins} минут** дараа дахин авч болно.`);
       return message.reply({ embeds: [embed] });
@@ -39,7 +39,7 @@ module.exports = {
     saveUser(userId, user);
 
     const embed = new EmbedBuilder()
-      .setColor(0xff69b4)
+      .setColor(0xE8B84B)
       .setTitle('🎁 Өдрийн урамшуулал!')
       .addFields(
         { name: '💵 Үндсэн', value: `₮${shortNum(base)}`, inline: true },

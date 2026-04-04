@@ -11,7 +11,7 @@ module.exports = {
     let user = getUser(userId);
     user = updateHunger(user);
     const now = Date.now();
-    const embed = new EmbedBuilder().setColor(0xff69b4);
+    const embed = new EmbedBuilder().setColor(0xE8B84B);
 
     if ((user.drunk || 0) >= 3) {
       embed.setTitle('🥴 Согтсон!').setDescription(`Та **${user.drunk.toFixed(1)} бүхэл** согтсон!\n🍺 Hangover Cure ав эсвэл хүлээ.`);
