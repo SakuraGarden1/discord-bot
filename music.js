@@ -6,14 +6,9 @@ const {
   VoiceConnectionStatus,
   entersState,
   NoSubscriberBehavior,
-  StreamType,
 } = require('@discordjs/voice');
 const ytdl = require('@distube/ytdl-core');
 const yts = require('yt-search');
-const ffmpeg = require('ffmpeg-static');
-const prism = require('prism-media');
-
-process.env.FFMPEG_PATH = ffmpeg;
 
 const queues = new Map();
 
@@ -25,7 +20,7 @@ function getQueue(guildId) {
     player.on('error', (e) => {
       console.error('[player error]', e.message);
       const q2 = queues.get(guildId);
-      if (q2) { q2.songs.shift(); void playTrack(guildId); }
+      if (q2 && q2.songs.length) { q2.songs.shift(); void playTrack(guildId); }
     });
     queues.set(guildId, q);
   }
@@ -49,27 +44,28 @@ async function playTrack(guildId) {
   const song = q.songs[0];
   try {
     const stream = ytdl(song.url, {
-      filter: 'audioonly',
-      quality: 'highestaudio',
+      filter: (format) =>
+        format.codecs === 'opus' &&
+        format.container === 'webm' &&
+        format.audioSampleRate == 48000,
+      quality: 'highest',
       highWaterMark: 1 << 25,
     });
 
-    const transcoder = new prism.FFmpeg({
-      args: [
-        '-analyzeduration', '0',
-        '-loglevel', '0',
-        '-f', 's16le',
-        '-ar', '48000',
-        '-ac', '2',
-      ],
-      shell: false,
+    stream.on('error', (e) => {
+      console.error('[stream error]', e.message);
     });
 
-    const resource = createAudioResource(stream.pipe(transcoder), {
-      inputType: StreamType.Raw,
+    const resource = createAudioResource(stream, {
+      inlineVolume: false,
+    });
+
+    resource.playStream.on('error', (e) => {
+      console.error('[resource error]', e.message);
     });
 
     q.player.play(resource);
+    console.log('[playing]', song.title);
   } catch (e) {
     console.error('[playTrack error]', e.message);
     q.songs.shift();
@@ -104,6 +100,7 @@ async function ensureConnection(message) {
   try {
     await entersState(q.connection, VoiceConnectionStatus.Ready, 15_000);
   } catch (e) {
+    console.error('[connection error]', e.message);
     q.connection.destroy();
     q.connection = null;
     throw e;
@@ -118,7 +115,10 @@ async function ensureConnection(message) {
         entersState(q.connection, VoiceConnectionStatus.Connecting, 5_000),
       ]);
     } catch {
-      if (q.connection) { q.connection.destroy(); q.connection = null; }
+      if (q.connection) {
+        q.connection.destroy();
+        q.connection = null;
+      }
     }
   });
 
