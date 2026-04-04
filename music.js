@@ -43,26 +43,43 @@ async function playTrack(guildId) {
   const q = queues.get(guildId);
   if (!q || !q.connection || !q.songs.length) return;
   const song = q.songs[0];
+
   try {
-    // opus/webm formatыг шууд stream хийх — ffmpeg шаардахгүй
-    const stream = ytdl(song.url, {
-      filter: (format) =>
-        format.codecs === 'opus' &&
-        format.container === 'webm' &&
-        format.audioSampleRate == 48000,
-      quality: 'highest',
-      highWaterMark: 1 << 25,
-    });
+    // Эхлээд WebmOpus format хайх
+    let stream = null;
+    let streamType = StreamType.Arbitrary;
+
+    const info = await ytdl.getInfo(song.url);
+    const webmFormat = info.formats.find(f =>
+      f.codecs === 'opus' &&
+      f.container === 'webm' &&
+      f.audioSampleRate == 48000
+    );
+
+    if (webmFormat) {
+      console.log('[format] Using WebmOpus');
+      stream = ytdl.downloadFromInfo(info, { format: webmFormat, highWaterMark: 1 << 25 });
+      streamType = StreamType.WebmOpus;
+    } else {
+      // Fallback: audioonly
+      console.log('[format] Falling back to audioonly');
+      stream = ytdl.downloadFromInfo(info, {
+        filter: 'audioonly',
+        quality: 'lowestaudio',
+        highWaterMark: 1 << 25,
+      });
+      streamType = StreamType.Arbitrary;
+    }
 
     stream.on('error', (e) => console.error('[stream error]', e.message));
 
     const resource = createAudioResource(stream, {
-      inputType: StreamType.WebmOpus,
+      inputType: streamType,
       inlineVolume: false,
     });
 
     q.player.play(resource);
-    console.log('[playing]', song.title);
+    console.log('[playing]', song.title, '| type:', streamType);
   } catch (e) {
     console.error('[playTrack error]', e.message);
     q.songs.shift();
