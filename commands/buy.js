@@ -78,8 +78,8 @@ module.exports = {
     }
     if (item.key === 'hangover_cure') {
       user.drunk = Math.max(0, (user.drunk || 0) - 3);
-      // Согтолт буурсны дараа байгалийн decay-ийг дахин тооцохын тулд сүүлийн уусан цагийг шинэчилнэ.
       user.lastDrink = Date.now();
+      user.lastDrunkDecay = Date.now();
       saveUser(userId, user);
       return message.reply(`✅ Hangover Cure уулаа!\n🥴 Согтолт: ${user.drunk.toFixed(1)}/10\n💵 Cash: ₮${shortNum(user.cash)}`);
     }

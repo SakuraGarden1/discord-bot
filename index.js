@@ -21,7 +21,20 @@ for (const file of commandFiles) {
   if (command.aliases) command.aliases.forEach(a => client.aliases.set(a, command.name));
 }
 
-client.on('ready', () => console.log(`✅ Bot is online as ${client.user.tag}`));
+const DRUNK_DECAY_MS = 60 * 60 * 1000;
+
+client.on('ready', () => {
+  console.log(`✅ Bot is online as ${client.user.tag}`);
+  const { decayAllUsersDrunk } = require('./db');
+  const tick = () => {
+    try {
+      decayAllUsersDrunk();
+    } catch (e) {
+      console.error('[decayAllUsersDrunk]', e);
+    }
+  };
+  setInterval(tick, DRUNK_DECAY_MS);
+});
 
 const cooldowns = new Map();
 const SPAM_COOLDOWN = 1500;
@@ -59,7 +72,9 @@ client.on('messageCreate', async (message) => {
         ];
         return message.reply(responses[Math.floor(Math.random() * responses.length)]);
       }
-    } catch {}
+    } catch (e) {
+      console.error('[drunk gate]', e);
+    }
   }
 
   try {

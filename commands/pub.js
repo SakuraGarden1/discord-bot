@@ -59,7 +59,7 @@ module.exports = {
         { name: '🟤 Доод зэрэглэл', value: cheap },
         { name: '⚪ Дунд зэрэглэл', value: mid },
         { name: '🟡 Дээд зэрэглэл', value: premium },
-      ).setFooter({ text: '!pub <дугаар> | 3.0+ work ажиллахгүй | 6.0+ бүх cmd ажиллахгүй' });
+      ).setFooter({ text: '!pub <дугаар> | 1 цаг тутамд согтолт -1.0 | 3.0+ work ажиллахгүй | 6.0+ бүх cmd ажиллахгүй' });
       return message.reply({ embeds: [embed] });
     }
 
@@ -75,6 +75,7 @@ module.exports = {
 
     user.cash -= finalPrice;
     const prevDrunk = user.drunk;
+    if ((prevDrunk || 0) <= 0) user.lastDrunkDecay = Date.now();
     user.drunk = Math.min(10, parseFloat((user.drunk + drink.drunk).toFixed(1)));
     user.drinkCount = (user.drinkCount || 0) + 1;
     if (user.drinkCount >= 10) user.addiction = true;
