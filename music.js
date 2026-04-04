@@ -8,7 +8,7 @@ const {
   NoSubscriberBehavior,
   StreamType,
 } = require('@discordjs/voice');
-const ytdl = require('@distube/ytdl-core');
+const playdl = require('play-dl');
 const yts = require('yt-search');
 
 const queues = new Map();
@@ -43,43 +43,14 @@ async function playTrack(guildId) {
   const q = queues.get(guildId);
   if (!q || !q.connection || !q.songs.length) return;
   const song = q.songs[0];
-
   try {
-    // Эхлээд WebmOpus format хайх
-    let stream = null;
-    let streamType = StreamType.Arbitrary;
-
-    const info = await ytdl.getInfo(song.url);
-    const webmFormat = info.formats.find(f =>
-      f.codecs === 'opus' &&
-      f.container === 'webm' &&
-      f.audioSampleRate == 48000
-    );
-
-    if (webmFormat) {
-      console.log('[format] Using WebmOpus');
-      stream = ytdl.downloadFromInfo(info, { format: webmFormat, highWaterMark: 1 << 25 });
-      streamType = StreamType.WebmOpus;
-    } else {
-      // Fallback: audioonly
-      console.log('[format] Falling back to audioonly');
-      stream = ytdl.downloadFromInfo(info, {
-        filter: 'audioonly',
-        quality: 'lowestaudio',
-        highWaterMark: 1 << 25,
-      });
-      streamType = StreamType.Arbitrary;
-    }
-
-    stream.on('error', (e) => console.error('[stream error]', e.message));
-
-    const resource = createAudioResource(stream, {
-      inputType: streamType,
+    const src = await playdl.stream(song.url, { quality: 2 });
+    const resource = createAudioResource(src.stream, {
+      inputType: src.type,
       inlineVolume: false,
     });
-
     q.player.play(resource);
-    console.log('[playing]', song.title, '| type:', streamType);
+    console.log('[playing]', song.title);
   } catch (e) {
     console.error('[playTrack error]', e.message);
     q.songs.shift();
@@ -139,23 +110,33 @@ async function ensureConnection(message) {
 async function resolveQuery(query) {
   const trimmed = query.trim();
   if (!trimmed) return null;
+
   if (trimmed.includes('youtube.com/watch') || trimmed.includes('youtu.be/')) {
     try {
-      const info = await ytdl.getInfo(trimmed);
-      return [{ title: info.videoDetails.title, url: trimmed }];
+      const info = await playdl.video_basic_info(trimmed);
+      return [{ title: info.video_details.title, url: trimmed }];
     } catch (e) {
       console.error('[resolveQuery url]', e.message);
       return null;
     }
   }
+
   try {
-    const results = await yts(trimmed);
-    const v = results.videos[0];
-    if (!v) return null;
-    return [{ title: v.title, url: v.url }];
+    const results = await playdl.search(trimmed, { limit: 1, source: { youtube: 'video' } });
+    if (!results.length) return null;
+    return [{ title: results[0].title, url: results[0].url }];
   } catch (e) {
-    console.error('[resolveQuery search]', e.message);
-    return null;
+    // play-dl search fails, fallback to yt-search
+    console.error('[playdl search fail, fallback]', e.message);
+    try {
+      const r = await yts(trimmed);
+      const v = r.videos[0];
+      if (!v) return null;
+      return [{ title: v.title, url: v.url }];
+    } catch (e2) {
+      console.error('[yts fallback fail]', e2.message);
+      return null;
+    }
   }
 }
 
