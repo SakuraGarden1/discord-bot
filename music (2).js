@@ -10,6 +10,10 @@ const {
 } = require('@discordjs/voice');
 const ytdl = require('@distube/ytdl-core');
 const yts = require('yt-search');
+const ffmpeg = require('ffmpeg-static');
+const prism = require('prism-media');
+
+process.env.FFMPEG_PATH = ffmpeg;
 
 const queues = new Map();
 
@@ -19,7 +23,7 @@ function getQueue(guildId) {
     const q = { songs: [], player, connection: null, guildId, loop: false };
     player.on(AudioPlayerStatus.Idle, () => onIdle(guildId));
     player.on('error', (e) => {
-      console.error('[music player error]', e.message);
+      console.error('[player error]', e.message);
       const q2 = queues.get(guildId);
       if (q2) { q2.songs.shift(); void playTrack(guildId); }
     });
@@ -46,10 +50,25 @@ async function playTrack(guildId) {
   try {
     const stream = ytdl(song.url, {
       filter: 'audioonly',
-      quality: 'lowestaudio',
+      quality: 'highestaudio',
       highWaterMark: 1 << 25,
     });
-    const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
+
+    const transcoder = new prism.FFmpeg({
+      args: [
+        '-analyzeduration', '0',
+        '-loglevel', '0',
+        '-f', 's16le',
+        '-ar', '48000',
+        '-ac', '2',
+      ],
+      shell: false,
+    });
+
+    const resource = createAudioResource(stream.pipe(transcoder), {
+      inputType: StreamType.Raw,
+    });
+
     q.player.play(resource);
   } catch (e) {
     console.error('[playTrack error]', e.message);
@@ -62,20 +81,26 @@ async function ensureConnection(message) {
   const channel = message.member?.voice?.channel;
   if (!channel) return null;
   const q = getQueue(message.guild.id);
-  if (q.connection && q.connection.state.status !== VoiceConnectionStatus.Destroyed) {
-    if (q.connection.joinConfig.channelId !== channel.id) {
+
+  if (q.connection) {
+    const status = q.connection.state.status;
+    if (status === VoiceConnectionStatus.Destroyed) {
+      q.connection = null;
+    } else if (q.connection.joinConfig.channelId === channel.id) {
+      return q.connection;
+    } else {
       q.connection.destroy();
       q.connection = null;
-    } else {
-      return q.connection;
     }
   }
+
   q.connection = joinVoiceChannel({
     channelId: channel.id,
     guildId: message.guild.id,
     adapterCreator: message.guild.voiceAdapterCreator,
     selfDeaf: true,
   });
+
   try {
     await entersState(q.connection, VoiceConnectionStatus.Ready, 15_000);
   } catch (e) {
@@ -83,9 +108,9 @@ async function ensureConnection(message) {
     q.connection = null;
     throw e;
   }
+
   q.connection.subscribe(q.player);
 
-  // Холболт тасарвал автоматаар цэвэрлэх
   q.connection.on(VoiceConnectionStatus.Disconnected, async () => {
     try {
       await Promise.race([
@@ -106,7 +131,7 @@ async function resolveQuery(query) {
   if (trimmed.includes('youtube.com/watch') || trimmed.includes('youtu.be/')) {
     try {
       const info = await ytdl.getInfo(trimmed);
-      return [{ title: info.videoDetails.title, url: trimmed, duration: info.videoDetails.lengthSeconds }];
+      return [{ title: info.videoDetails.title, url: trimmed }];
     } catch (e) {
       console.error('[resolveQuery url]', e.message);
       return null;
@@ -116,7 +141,7 @@ async function resolveQuery(query) {
     const results = await yts(trimmed);
     const v = results.videos[0];
     if (!v) return null;
-    return [{ title: v.title, url: v.url, duration: v.seconds }];
+    return [{ title: v.title, url: v.url }];
   } catch (e) {
     console.error('[resolveQuery search]', e.message);
     return null;
