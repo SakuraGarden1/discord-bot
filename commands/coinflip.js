@@ -10,7 +10,7 @@ module.exports = {
     const user = getUser(userId);
     const bet = parseInt(args[0]);
     const raw = args[1]?.toLowerCase();
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🪙 Coinflip');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🪙 Coinflip');
     const choice = raw === 'h' ? 'heads' : raw === 't' ? 'tails' : raw;
 
     if (!bet || bet <= 0) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!cf 500 h` эсвэл `!cf 500 t`')] });

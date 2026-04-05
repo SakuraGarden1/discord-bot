@@ -17,7 +17,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const bet = parseInt(args[0]);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🎰 Slot Machine');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🎰 Slot Machine');
 
     if (!bet || bet <= 0) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!slot 500`')] });
     if (bet > user.cash) return message.reply({ embeds: [embed.setDescription('❌ Хангалттай мөнгө байхгүй!')] });

@@ -9,7 +9,7 @@ module.exports = {
     const user = getUser(userId);
     const bet = parseInt(args[0]);
     const guess = parseInt(args[1]);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🎲 Dice');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🎲 Dice');
 
     if (!bet || bet <= 0 || !guess || guess < 1 || guess > 6)
       return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!dice 500 4` (1-6 дугаар таах)')] });

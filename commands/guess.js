@@ -9,7 +9,7 @@ module.exports = {
   async execute(message, args) {
     const userId = message.author.id;
     const user = getUser(userId);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🔢 Тоо таах');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🔢 Тоо таах');
 
     if (activeGames.has(userId)) {
       const game = activeGames.get(userId);

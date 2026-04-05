@@ -9,7 +9,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const jobs = getAvailableJobs(user.level);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('👔 Ажил сонгох');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('👔 Ажил сонгох');
 
     if (!args[0]) {
       embed.addFields(

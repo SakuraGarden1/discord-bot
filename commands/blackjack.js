@@ -10,7 +10,7 @@ function shuffle(d){for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random
 function cardValue(c){if(['J','Q','K'].includes(c.rank))return 10;if(c.rank==='A')return 11;return parseInt(c.rank);}
 function handValue(h){let t=h.reduce((s,c)=>s+cardValue(c),0),a=h.filter(c=>c.rank==='A').length;while(t>21&&a-->0)t-=10;return t;}
 function formatHand(h){return h.map(c=>`${c.rank}${c.suit}`).join(' ');}
-function gameEmbed(title,fields,footer){const e=new EmbedBuilder().setColor(0xE8B84B).setTitle(`🃏 ${title}`).addFields(fields);if(footer)e.setFooter({text:footer});return e;}
+function gameEmbed(title,fields,footer){const e=new EmbedBuilder().setColor(0xFFC0CB).setTitle(`🃏 ${title}`).addFields(fields);if(footer)e.setFooter({text:footer});return e;}
 
 const games=new Map();
 async function addReactions(msg){try{await msg.react(HIT);await msg.react(STAND);}catch{}}

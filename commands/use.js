@@ -7,7 +7,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const item = args[0]?.toLowerCase();
-    const embed = new EmbedBuilder().setColor(0xE8B84B);
+    const embed = new EmbedBuilder().setColor(0xFFC0CB);
 
     if (item === 'luckycharm' || item === 'lucky') {
       const count = user.inventory?.lucky_charm || 0;

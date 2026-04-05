@@ -3,7 +3,7 @@ const { rand, shortNum } = require('../economy');
 const { isProtected } = require('../protected_roles');
 const { EmbedBuilder } = require('discord.js');
 
-const COOLDOWN = 24 * 60 * 60 * 1000; // 24 цаг
+const COOLDOWN = 6 * 60 * 60 * 1000; // 6 цаг // 24 цаг
 
 module.exports = {
   name: 'bankrob',
@@ -11,7 +11,7 @@ module.exports = {
   async execute(message, args) {
     const userId = message.author.id;
     const target = message.mentions.users.first();
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🏦 Банкны дээрэм');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🏦 Банкны дээрэм');
 
     if (!target) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!bankrob @user`')] });
     if (target.id === userId) return message.reply({ embeds: [embed.setDescription('❌ Өөрийнхөө банкийг дээрэмдэж болохгүй!')] });

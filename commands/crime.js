@@ -18,7 +18,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const now = Date.now();
-    const embed = new EmbedBuilder().setColor(0xE8B84B);
+    const embed = new EmbedBuilder().setColor(0xFFC0CB);
 
     if (!user.lastCrime) user.lastCrime = 0;
     if (now - user.lastCrime < COOLDOWN) {

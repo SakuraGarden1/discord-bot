@@ -12,7 +12,7 @@ module.exports = {
     const user = getUser(userId);
     const bet = parseInt(args[0]);
     const choice = args[1]?.toLowerCase();
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('✂️ Чулуу Цаас Хайч');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('✂️ Чулуу Цаас Хайч');
 
     if (!bet || bet <= 0 || !['r','p','s'].includes(choice))
       return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!rps 500 r` (r=чулуу, p=цаас, s=хайч)')] });

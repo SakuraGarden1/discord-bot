@@ -7,7 +7,6 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
-    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 
@@ -25,7 +24,6 @@ client.on('ready', () => console.log(`✅ Bot is online as ${client.user.tag}`))
 
 const cooldowns = new Map();
 const SPAM_COOLDOWN = 1500;
-const ALWAYS_ALLOWED = ['help', 'balance', 'bal', 'profile', 'pro', 'play', 'p', 'stop', 'skip', 'queue', 'q', 'loop', 'np'];
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;

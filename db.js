@@ -20,16 +20,14 @@ function getUser(userId) {
       cash: 1000, bank: 0, xp: 0, level: 1,
       lastWork: 0, lastRob: 0, lastCrime: 0, lastDaily: 0,
       lastBankRob: 0, dailyStreak: 0, inventory: {},
-      hunger: 100, lastHungerUpdate: Date.now(),
-      married: null, selectedJob: null, stress: 0,
+      married: null, selectedJob: null,
     };
     saveDB(db);
   }
   const u = db.users[userId];
   const defaults = {
-    hunger: 100, lastHungerUpdate: Date.now(), married: null,
-    selectedJob: null, lastBankRob: 0, lastCrime: 0, lastDaily: 0,
-    dailyStreak: 0, inventory: {}, stress: 0,
+    married: null, selectedJob: null, lastBankRob: 0,
+    lastCrime: 0, lastDaily: 0, dailyStreak: 0, inventory: {},
   };
   let changed = false;
   for (const [k, v] of Object.entries(defaults)) {
@@ -43,20 +41,5 @@ function saveUser(userId, data) { const db = loadDB(); db.users[userId] = data; 
 function getAllUsers() { return loadDB().users; }
 function setOwner(userId) { const db = loadDB(); db.owner = userId; saveDB(db); }
 function getOwner() { return loadDB().owner; }
-function addToOwner(amount) {
-  const db = loadDB();
-  if (!db.owner) return;
-  if (!db.users[db.owner]) db.users[db.owner] = { cash: 0, bank: 0, xp: 0, level: 1, lastWork: 0, lastRob: 0, lastCrime: 0, lastDaily: 0, lastBankRob: 0, dailyStreak: 0, inventory: {}, hunger: 100, lastHungerUpdate: Date.now(), married: null, selectedJob: null, stress: 0 };
-  db.users[db.owner].cash += amount;
-  saveDB(db);
-}
 
-function updateHunger(user) {
-  const now = Date.now();
-  const elapsed = (now - (user.lastHungerUpdate || now)) / 3600000;
-  user.hunger = Math.max(0, (user.hunger || 100) - elapsed * (100 / 12));
-  user.lastHungerUpdate = now;
-  return user;
-}
-
-module.exports = { getUser, saveUser, getAllUsers, setOwner, getOwner, addToOwner, updateHunger };
+module.exports = { getUser, saveUser, getAllUsers, setOwner, getOwner };

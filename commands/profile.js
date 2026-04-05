@@ -1,5 +1,5 @@
-const { getUser, updateHunger } = require('../db');
-const { getJob, getRank, xpForNextLevel, shortNum } = require('../economy');
+const { getUser } = require('../db');
+const { getJob, xpForNextLevel, shortNum } = require('../economy');
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
@@ -7,14 +7,11 @@ module.exports = {
   aliases: ['pro'],
   async execute(message, args) {
     const target = message.mentions.users.first() || message.author;
-    let user = getUser(target.id);
-    user = updateHunger(user);
+    const user = getUser(target.id);
     const job = getJob(user.level);
-    const rank = getRank(user.level);
     const nextXP = xpForNextLevel(user.level);
     const progress = Math.floor((user.xp / nextXP) * 10);
     const bar = '█'.repeat(progress) + '░'.repeat(10 - progress);
-    const hungerBar = '🟩'.repeat(Math.floor(user.hunger / 10)) + '⬛'.repeat(10 - Math.floor(user.hunger / 10));
     const streak = user.dailyStreak || 0;
 
     let marriedText = '💔 Гэрлээгүй';
@@ -25,21 +22,24 @@ module.exports = {
       } catch { marriedText = '💑 Гэрлэсэн'; }
     }
 
+    const inv = user.inventory || {};
+    const badges = [];
+    if (inv.supreme_badge) badges.push('🏅 SUPREME');
+    if (inv.vip_pass) badges.push('💎 VIP');
+
     const embed = new EmbedBuilder()
-      .setColor(0xE8B84B)
-      .setTitle(`${rank.emoji} ${target.username}`)
+      .setColor(0xFFC0CB)
+      .setTitle(`🌸 ${target.username}${badges.length ? ' ' + badges.join(' ') : ''}`)
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '🏅 Rank', value: `${rank.emoji} **${rank.name}**`, inline: true },
+        { name: '👔 Ажил', value: job.name, inline: true },
         { name: '📊 Level', value: `${user.level}`, inline: true },
         { name: '🔥 Streak', value: `${streak} өдөр`, inline: true },
-        { name: '👔 Ажил', value: job.name, inline: true },
-        { name: '💍 Гэрлэлт', value: marriedText, inline: true },
         { name: '⭐ XP', value: `\`[${bar}]\` ${user.xp}/${nextXP}` },
         { name: '💵 Cash', value: `₮${shortNum(user.cash)}`, inline: true },
         { name: '🏦 Bank', value: `₮${shortNum(user.bank)}`, inline: true },
         { name: '💰 Нийт', value: `₮${shortNum(user.cash + user.bank)}`, inline: true },
-        { name: `🍽️ Өлсгөлөн ${Math.floor(user.hunger)}%`, value: hungerBar },
+        { name: '💍 Гэрлэлт', value: marriedText, inline: true },
       );
     message.reply({ embeds: [embed] });
   },

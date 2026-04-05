@@ -19,19 +19,15 @@ module.exports = {
       }
     }
 
-    // Discord 1024 тэмдэгтийн хязгаарт багтаах
-    const unlockedText = unlocked.join('\n').slice(0, 1020) || 'Байхгүй';
-    const lockedText = locked.join('\n').slice(0, 1020) || 'Байхгүй';
-
     const embed = new EmbedBuilder()
-      .setColor(0xE8B84B)
+      .setColor(0xFFC0CB)
       .setTitle('👔 Бүх ажлууд')
       .addFields(
-        { name: `📊 Таны level: ${user.level}`, value: `Одоогийн ажил: ${currentJob.name}` },
-        { name: `✅ Нээлттэй ажлууд (${unlocked.length})`, value: unlockedText },
-        { name: `🔒 Түгжигдсэн ажлууд (${locked.length})`, value: lockedText },
+        { name: `📊 Таны level: ${user.level} | ${currentJob.name}`, value: '\u200b' },
+        { name: `✅ Нээлттэй (${unlocked.length})`, value: unlocked.join('\n').slice(0, 1020) || 'Байхгүй' },
+        { name: `🔒 Түгжигдсэн (${locked.length})`, value: locked.join('\n').slice(0, 1020) || 'Байхгүй' },
       )
-      .setFooter({ text: 'Ажил сонгохдоо: !job | Сонгосон ажлаараа !work хийнэ' });
+      .setFooter({ text: 'Ажил сонгохдоо: !job' });
 
     message.reply({ embeds: [embed] });
   },

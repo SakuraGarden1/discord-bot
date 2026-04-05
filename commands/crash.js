@@ -10,7 +10,7 @@ module.exports = {
     const userId = message.author.id;
     const user = getUser(userId);
     const bet = parseInt(args[0]);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🚀 Crash');
+    const embed = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🚀 Crash');
 
     if (!bet || bet <= 0) return message.reply({ embeds: [embed.setDescription('❌ Жишээ: `!crash 500`')] });
     if (bet > user.cash) return message.reply({ embeds: [embed.setDescription('❌ Хангалттай мөнгө байхгүй!')] });
@@ -23,7 +23,7 @@ module.exports = {
     let cashedOut = false;
 
     const msg = await message.reply({
-      embeds: [new EmbedBuilder().setColor(0xE8B84B).setTitle('🚀 Crash')
+      embeds: [new EmbedBuilder().setColor(0xFFC0CB).setTitle('🚀 Crash')
         .setDescription(`📈 **x${current.toFixed(2)}**\n💰 Bet: ₮${shortNum(bet)}\n\n${CASHOUT} дарж cash out хийнэ!`)]
     });
     await msg.react(CASHOUT);
@@ -63,7 +63,7 @@ module.exports = {
 
       current = parseFloat((current + 0.10 + Math.random() * 0.15).toFixed(2));
 
-      const e = new EmbedBuilder().setColor(0xE8B84B).setTitle('🚀 Crash')
+      const e = new EmbedBuilder().setColor(0xFFC0CB).setTitle('🚀 Crash')
         .setDescription(`📈 **x${current.toFixed(2)}**\n💰 Bet: ₮${shortNum(bet)}\n\n${CASHOUT} дарж cash out хийнэ!`);
       await msg.edit({ embeds: [e] }).catch(() => {});
     }, 1500);
