@@ -6,9 +6,8 @@ const {
   VoiceConnectionStatus,
   entersState,
   NoSubscriberBehavior,
-  StreamType,
 } = require('@discordjs/voice');
-const playdl = require('play-dl');
+const ytdl = require('@distube/ytdl-core');
 const yts = require('yt-search');
 
 const queues = new Map();
@@ -44,11 +43,13 @@ async function playTrack(guildId) {
   if (!q || !q.connection || !q.songs.length) return;
   const song = q.songs[0];
   try {
-    const src = await playdl.stream(song.url, { quality: 2 });
-    const resource = createAudioResource(src.stream, {
-      inputType: src.type,
-      inlineVolume: false,
+    const stream = ytdl(song.url, {
+      filter: 'audioonly',
+      quality: 'lowestaudio',
+      highWaterMark: 1 << 25,
+      dlChunkSize: 0,
     });
+    const resource = createAudioResource(stream, { inlineVolume: false });
     q.player.play(resource);
     console.log('[playing]', song.title);
   } catch (e) {
@@ -111,32 +112,26 @@ async function resolveQuery(query) {
   const trimmed = query.trim();
   if (!trimmed) return null;
 
+  // YouTube link
   if (trimmed.includes('youtube.com/watch') || trimmed.includes('youtu.be/')) {
     try {
-      const info = await playdl.video_basic_info(trimmed);
-      return [{ title: info.video_details.title, url: trimmed }];
+      const info = await ytdl.getInfo(trimmed);
+      return [{ title: info.videoDetails.title, url: trimmed }];
     } catch (e) {
       console.error('[resolveQuery url]', e.message);
       return null;
     }
   }
 
+  // Search by name
   try {
-    const results = await playdl.search(trimmed, { limit: 1, source: { youtube: 'video' } });
-    if (!results.length) return null;
-    return [{ title: results[0].title, url: results[0].url }];
+    const r = await yts(trimmed);
+    const v = r.videos[0];
+    if (!v) return null;
+    return [{ title: v.title, url: v.url }];
   } catch (e) {
-    // play-dl search fails, fallback to yt-search
-    console.error('[playdl search fail, fallback]', e.message);
-    try {
-      const r = await yts(trimmed);
-      const v = r.videos[0];
-      if (!v) return null;
-      return [{ title: v.title, url: v.url }];
-    } catch (e2) {
-      console.error('[yts fallback fail]', e2.message);
-      return null;
-    }
+    console.error('[yts error]', e.message);
+    return null;
   }
 }
 

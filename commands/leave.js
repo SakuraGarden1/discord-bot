@@ -1,13 +1,12 @@
-const { EmbedBuilder } = require('discord.js');
-const music = require('../music');
+const { leaveVoice } = require('../music');
 
 module.exports = {
   name: 'leave',
-  aliases: ['disconnect', 'dc'],
+  aliases: ['dc', 'disconnect'],
   async execute(message) {
-    if (!message.guild) return message.reply('❌ Энэ команд зөвхөн сервер дээр ажиллана.');
-    music.leaveVoice(message.guild.id);
-    const embed = new EmbedBuilder().setColor(0xff69b4).setTitle('👋 Leave').setDescription('Дууны сувагнаас гарлаа.');
-    return message.reply({ embeds: [embed] });
+    if (!message.member?.voice?.channel)
+      return message.reply('❌ Voice channel-д орно уу!');
+    leaveVoice(message.guild.id);
+    message.reply('👋 Voice channel-аас гарлаа.');
   },
 };

@@ -1,17 +1,20 @@
-const { EmbedBuilder } = require('discord.js');
+const { getQueueList, isLooping } = require('../music');
 
 module.exports = {
   name: 'queue',
   aliases: ['q'],
   async execute(message) {
-    const playModule = require('./play');
-    const queues = playModule.queues || new Map();
-    const queue = queues.get(message.guild.id);
-    const embed = new EmbedBuilder().setColor(0xE8B84B).setTitle('🎵 Queue');
-    if (!queue || queue.songs.length === 0) return message.reply({ embeds: [embed.setDescription('Queue хоосон байна.')] });
-    const list = queue.songs.map((s, i) => `${i === 0 ? '▶️' : `${i}.`} **${s.title}** (${s.duration})`).slice(0, 10).join('\n');
-    embed.setDescription(list);
-    if (queue.loop) embed.setFooter({ text: '🔁 Loop идэвхтэй' });
-    message.reply({ embeds: [embed] });
+    const songs = getQueueList(message.guild.id);
+    if (!songs.length) return message.reply('📭 Дараалал хоосон байна.');
+
+    const loop = isLooping(message.guild.id);
+    const lines = songs.slice(0, 10).map((s, i) =>
+      i === 0
+        ? `▶️ **${s.title}** — *${s.requester}*`
+        : `\`${i}.\` ${s.title} — *${s.requester}*`
+    );
+    if (songs.length > 10) lines.push(`... болон ${songs.length - 10} дуу байна.`);
+
+    message.reply(`🎵 **Дараалал** ${loop ? '🔁 (loop)' : ''}\n${lines.join('\n')}`);
   },
 };
